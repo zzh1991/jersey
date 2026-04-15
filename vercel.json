@@ -13,6 +13,10 @@
     {
       "source": "/api/jerseys/:id",
       "destination": "/api/jerseys/[id]"
+    },
+    {
+      "source": "/:path((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }
