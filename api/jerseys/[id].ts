@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { prisma } from '../lib/prisma'
+import { prisma } from '../lib/prisma.js'
 import { JerseyType, ClothingType, MatchType, Brand } from '@prisma/client'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
