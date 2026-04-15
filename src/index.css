@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  /* 背景色 */
+  --color-background: #0a0a0b;
+  --color-card: #141416;
+
+  /* 强调色 */
+  --color-primary: #3b82f6;
+
+  /* 边框 */
+  --color-border: rgba(255, 255, 255, 0.08);
+
+  /* 圆角 */
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* 字体 */
+  --font-sans: "Geist", system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-background);
+  color: white;
+  font-family: var(--font-sans);
+}
+
+/* Skeleton shimmer animation */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.04),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

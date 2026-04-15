@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/jerseys/:id/like",
+      "destination": "/api/jerseys/[id]/like"
+    },
+    {
+      "source": "/api/jerseys/:id/image",
+      "destination": "/api/jerseys/[id]/image"
+    },
+    {
+      "source": "/api/jerseys/:id",
+      "destination": "/api/jerseys/[id]"
+    }
+  ]
+}

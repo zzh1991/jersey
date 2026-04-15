@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Jersey {
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(255)
+  brand        Brand         @default(OTHER)
+  technology   String?       @db.VarChar(255)
+  jerseyType   JerseyType
+  clothingType ClothingType
+  club         String        @db.VarChar(255)
+  country      String        @db.VarChar(255)
+  matchType    MatchType
+  year         Int
+  season       String        @db.VarChar(20)
+  price        Decimal       @db.Decimal(10, 2)
+  likes        Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  image JerseyImage?
+
+  @@index([name])
+  @@index([club])
+  @@index([country])
+  @@index([likes])
+  @@index([brand])
+  @@map("jerseys")
+}
+
+enum Brand {
+  NIKE
+  ADIDAS
+  PUMA
+  NEW_BALANCE
+  UNDER_ARMOUR
+  KAPPA
+  LOTTO
+  DIADORA
+  HUMMEL
+  UMBRO
+  MACRON
+  JOMA
+  ERREA
+  LE_COQ_SPORTIF
+  OTHER
+}
+
+model JerseyImage {
+  id          Int      @id @default(autoincrement())
+  jerseyId    Int      @unique
+  imageData   Bytes    @db.LongBlob
+  contentType String   @db.VarChar(50)
+  createdAt   DateTime @default(now())
+
+  jersey Jersey @relation(fields: [jerseyId], references: [id], onDelete: Cascade)
+
+  @@map("jersey_images")
+}
+
+enum JerseyType {
+  PLAYER
+  FAN
+}
+
+enum ClothingType {
+  SHORT_SLEEVE
+  LONG_SLEEVE
+  HALF_ZIP_TRAINING
+  SHORT_TRAINING
+  LONG_TRAINING
+}
+
+enum MatchType {
+  HOME
+  AWAY_1
+  AWAY_2
+  AWAY_3
+  CUP
+}
