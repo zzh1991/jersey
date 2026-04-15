@@ -53,25 +53,6 @@ const jerseyTypeLabels: Record<string, string> = {
   fan: '球迷版',
 }
 
-const clothingTypeLabels: Record<string, string> = {
-  SHORT_SLEEVE: '短袖球衣',
-  LONG_SLEEVE: '长袖球衣',
-  HALF_ZIP_TRAINING: '半拉链训练服',
-  SHORT_TRAINING: '短袖训练服',
-  LONG_TRAINING: '长袖训练服',
-  VEST: '背心',
-  SHORTS: '短裤',
-  LONG_PANTS: '训练长裤',
-  short_sleeve: '短袖球衣',
-  long_sleeve: '长袖球衣',
-  half_zip_training: '半拉链训练服',
-  short_training: '短袖训练服',
-  long_training: '长袖训练服',
-  vest: '背心',
-  shorts: '短裤',
-  long_pants: '训练长裤',
-}
-
 const matchTypeLabels: Record<string, string> = {
   HOME: '主场',
   AWAY_1: '一客',
@@ -85,6 +66,7 @@ const matchTypeLabels: Record<string, string> = {
   cup: '杯赛',
 }
 
+// @ts-expect-error - Vite env
 const showDeleteButton = import.meta.env.VITE_SHOW_DELETE_BUTTON === 'true'
 
 export default memo(function JerseyCard({ jersey, onEdit, onDelete, onLike }: JerseyCardProps) {

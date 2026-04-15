@@ -12,14 +12,14 @@ interface ImageLightboxProps {
 
 // Spring physics for natural motion
 const springConfig = {
-  type: 'spring',
+  type: 'spring' as const,
   stiffness: 300,
   damping: 30,
 }
 
 // Smoother exit animation with spring physics
 const exitSpringConfig = {
-  type: 'spring',
+  type: 'spring' as const,
   stiffness: 400,
   damping: 35,
 }
@@ -27,7 +27,7 @@ const exitSpringConfig = {
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
-  exit: { opacity: 0, transition: { duration: 0.2, ease: 'easeOut' } },
+  exit: { opacity: 0, transition: { duration: 0.2, ease: 'easeOut' as const } },
 }
 
 const imageVariants = {
@@ -66,7 +66,7 @@ const controlsVariants = {
   exit: {
     opacity: 0,
     y: 10,
-    transition: { duration: 0.15, ease: 'easeOut' },
+    transition: { duration: 0.15, ease: 'easeOut' as const },
   },
 }
 
@@ -164,8 +164,8 @@ export default memo(function ImageLightbox({ src, isOpen, onClose, alt = '' }: I
 
     const lightboxEl = document.querySelector('[data-lightbox]')
     if (lightboxEl) {
-      lightboxEl.addEventListener('wheel', handleWheel, { passive: false })
-      return () => lightboxEl.removeEventListener('wheel', handleWheel)
+      lightboxEl.addEventListener('wheel', handleWheel as EventListener, { passive: false })
+      return () => lightboxEl.removeEventListener('wheel', handleWheel as EventListener)
     }
   }, [isOpen, springScale])
 
