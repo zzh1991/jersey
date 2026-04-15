@@ -3,6 +3,48 @@ import type { JerseyWithImage, JerseyFormData } from '../types/jersey'
 
 const API_BASE_URL = '/api'
 
+// 压缩图片
+async function compressImage(file: File, maxWidth = 1200, maxHeight = 1200, quality = 0.8): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    if (!ctx) {
+      reject(new Error('Canvas not supported'))
+      return
+    }
+
+    img.onload = () => {
+      let { width, height } = img
+
+      // 计算缩放比例
+      if (width > maxWidth || height > maxHeight) {
+        const ratio = Math.min(maxWidth / width, maxHeight / height)
+        width *= ratio
+        height *= ratio
+      }
+
+      canvas.width = width
+      canvas.height = height
+      ctx.drawImage(img, 0, 0, width, height)
+
+      // 转换为 base64
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
+      resolve(compressedDataUrl)
+    }
+
+    img.onerror = reject
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      img.src = e.target?.result as string
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 interface JerseyState {
   jerseys: JerseyWithImage[]
   isLoading: boolean
@@ -153,35 +195,24 @@ export const useJerseyStore = create<JerseyState>((set, get) => ({
 
   uploadImage: async (id, file) => {
     try {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
+      // 压缩图片
+      const compressedImageData = await compressImage(file, 1200, 1200, 0.8)
 
-      await new Promise<void>((resolve, reject) => {
-        reader.onload = async () => {
-          try {
-            const imageData = reader.result as string
-            const response = await fetch(`${API_BASE_URL}/jerseys/${id}/image`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                imageData,
-                contentType: file.type,
-              }),
-            })
+      const response = await fetch(`${API_BASE_URL}/jerseys/${id}/image`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageData: compressedImageData,
+          contentType: 'image/jpeg',
+        }),
+      })
 
-            if (!response.ok) throw new Error('Failed to upload image')
+      if (!response.ok) throw new Error('Failed to upload image')
 
-            set({
-              jerseys: get().jerseys.map(j =>
-                j.id === id ? { ...j, hasImage: true } : j
-              )
-            })
-            resolve()
-          } catch (error) {
-            reject(error)
-          }
-        }
-        reader.onerror = reject
+      set({
+        jerseys: get().jerseys.map(j =>
+          j.id === id ? { ...j, hasImage: true } : j
+        )
       })
     } catch (error) {
       set({ error: 'Failed to upload image' })
