@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { TShirt, ArrowLeft } from '@phosphor-icons/react'
 import { Link } from 'react-router'
 import JerseyCard from '@/modules/jersey/components/JerseyCard'
@@ -9,6 +9,7 @@ import { useJerseyStore } from '@/modules/jersey/stores/jerseyStore'
 import type { JerseyWithImage, JerseyFormData } from '@/modules/jersey/types/jersey'
 
 export default function JerseyPage() {
+  const reduced = useReducedMotion()
   const {
     jerseys,
     isLoading,
@@ -29,10 +30,17 @@ export default function JerseyPage() {
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingJersey, setEditingJersey] = useState<JerseyWithImage | null>(null)
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false)
 
   useEffect(() => {
     fetchJerseys()
   }, [fetchJerseys, searchQuery, sortBy, sortOrder])
+
+  useEffect(() => {
+    if (!isLoading && jerseys.length > 0 && !hasInitiallyLoaded) {
+      setHasInitiallyLoaded(true)
+    }
+  }, [isLoading, jerseys.length, hasInitiallyLoaded])
 
   const handleAddClick = useCallback(() => {
     setEditingJersey(null)
@@ -156,13 +164,22 @@ export default function JerseyPage() {
           </div>
         ) : jerseys.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: reduced ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduced ? 0.01 : 0.4 }}
             className="text-center py-20"
           >
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/[0.03] mb-6">
+            <motion.div
+              className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/[0.03] mb-6"
+              animate={reduced ? {} : { y: [0, -4, 0] }}
+              transition={reduced ? {} : {
+                duration: 2.5,
+                repeat: Infinity,
+                ease: [0.37, 0, 0.63, 1],
+              }}
+            >
               <TShirt className="w-10 h-10 text-white/20" />
-            </div>
+            </motion.div>
             <h2 className="text-xl font-semibold text-white mb-2">
               {searchQuery ? '没有找到匹配的球衣' : '还没有球衣'}
             </h2>
@@ -182,30 +199,20 @@ export default function JerseyPage() {
           </motion.div>
         ) : (
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.05,
-                },
-              },
-            }}
+            initial={hasInitiallyLoaded ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduced ? 0.01 : 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
           >
-            <AnimatePresence>
-              {jerseys.map((jersey) => (
-                <JerseyCard
-                  key={jersey.id}
-                  jersey={jersey}
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteClick}
-                  onLike={handleLikeClick}
-                />
-              ))}
-            </AnimatePresence>
+            {jerseys.map((jersey) => (
+              <JerseyCard
+                key={jersey.id}
+                jersey={jersey}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+                onLike={handleLikeClick}
+              />
+            ))}
           </motion.div>
         )}
       </main>

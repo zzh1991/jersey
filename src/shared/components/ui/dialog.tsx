@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { cn } from '@/shared/lib/utils'
 
 export interface DialogProps {
@@ -9,6 +9,8 @@ export interface DialogProps {
 }
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
+  const reduced = useReducedMotion()
+
   return (
     <AnimatePresence>
       {open && (
@@ -17,17 +19,26 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, transition: { duration: reduced ? 0.01 : 0.12 } }}
+            transition={{ duration: reduced ? 0.01 : 0.2 }}
             onClick={() => onOpenChange?.(false)}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
           {/* Content container */}
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            initial={{ y: reduced ? 0 : '100%', opacity: reduced ? 1 : 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{
+              y: reduced ? 0 : '100%',
+              opacity: reduced ? 1 : 0,
+              transition: reduced
+                ? { duration: 0.01 }
+                : {
+                    y: { type: 'tween', duration: 0.18, ease: [0.32, 0.72, 0, 1] },
+                    opacity: { duration: 0.12 },
+                  },
+            }}
+            transition={reduced ? { duration: 0.01 } : { type: 'spring', damping: 30, stiffness: 300 }}
             className="relative z-50 w-full sm:max-w-2xl max-h-[90dvh] sm:max-h-[85dvh] flex flex-col sm:mx-4 sm:rounded-2xl rounded-t-2xl bg-[#141416] border border-white/[0.06] border-b-0 sm:border-b overflow-hidden"
           >
             {/* Drag handle for mobile */}

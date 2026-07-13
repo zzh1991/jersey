@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useSpring, useTransform, useReducedMotion } from 'framer-motion'
 import { MagnifyingGlassPlus, MagnifyingGlassMinus, X } from '@phosphor-icons/react'
 import { cn } from '@/shared/lib/utils'
 
@@ -17,43 +17,10 @@ const springConfig = {
   damping: 30,
 }
 
-// Smoother exit animation with spring physics
-const exitSpringConfig = {
-  type: 'spring' as const,
-  stiffness: 400,
-  damping: 35,
-}
-
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
   exit: { opacity: 0, transition: { duration: 0.2, ease: 'easeOut' as const } },
-}
-
-const imageVariants = {
-  hidden: {
-    scale: 0.8,
-    opacity: 0,
-    y: 20,
-  },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    y: 0,
-    transition: {
-      ...springConfig,
-      opacity: { duration: 0.2 },
-    },
-  },
-  exit: {
-    scale: 0.9,
-    opacity: 0,
-    y: 15,
-    transition: {
-      ...exitSpringConfig,
-      opacity: { duration: 0.15 },
-    },
-  },
 }
 
 const controlsVariants = {
@@ -73,6 +40,7 @@ const controlsVariants = {
 export default memo(function ImageLightbox({ src, isOpen, onClose, alt = '' }: ImageLightboxProps) {
   const controlsRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
+  const reduced = useReducedMotion()
 
   // Use refs for scale to avoid re-renders
   const scaleRef = useRef(1)
@@ -186,7 +154,7 @@ export default memo(function ImageLightbox({ src, isOpen, onClose, alt = '' }: I
           initial="hidden"
           animate="visible"
           exit="hidden"
-          transition={{ duration: 0.25 }}
+          transition={{ duration: reduced ? 0.01 : 0.25 }}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95"
           onClick={handleClose}
         >
@@ -225,7 +193,7 @@ export default memo(function ImageLightbox({ src, isOpen, onClose, alt = '' }: I
               onClick={handleZoomOut}
               disabled={scaleRef.current <= 0.5}
               className={cn(
-                'p-2.5 sm:p-2 rounded-full transition-all duration-200 cursor-pointer',
+                'p-2.5 sm:p-2 rounded-full transition-[background-color,color,transform] duration-150 ease-[var(--ease-out)] cursor-pointer',
                 scaleRef.current <= 0.5
                   ? 'text-white/30 cursor-not-allowed'
                   : 'text-white/80 hover:text-white hover:bg-white/10 active:scale-95'
@@ -240,7 +208,7 @@ export default memo(function ImageLightbox({ src, isOpen, onClose, alt = '' }: I
               onClick={handleZoomIn}
               disabled={scaleRef.current >= 3}
               className={cn(
-                'p-2.5 sm:p-2 rounded-full transition-all duration-200 cursor-pointer',
+                'p-2.5 sm:p-2 rounded-full transition-[background-color,color,transform] duration-150 ease-[var(--ease-out)] cursor-pointer',
                 scaleRef.current >= 3
                   ? 'text-white/30 cursor-not-allowed'
                   : 'text-white/80 hover:text-white hover:bg-white/10 active:scale-95'
@@ -262,10 +230,9 @@ export default memo(function ImageLightbox({ src, isOpen, onClose, alt = '' }: I
           >
             <motion.img
               ref={imageRef}
-              variants={imageVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
+              initial={reduced ? { opacity: 0 } : { scale: 0.8, opacity: 0, y: 20 }}
+              animate={reduced ? { opacity: 1 } : { scale: 1, opacity: 1, y: 0 }}
+              exit={reduced ? { opacity: 0 } : { scale: 0.9, opacity: 0, y: 15 }}
               src={src}
               alt={alt}
               style={{

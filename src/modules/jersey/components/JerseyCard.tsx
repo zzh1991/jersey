@@ -1,5 +1,5 @@
 import { useState, useCallback, memo } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Heart, Pencil, Trash, TShirt, MagnifyingGlassPlus } from '@phosphor-icons/react'
 import { Button } from '@/shared/components/ui/button'
 import ImageLightbox from '@/shared/components/ImageLightbox'
@@ -70,6 +70,7 @@ const matchTypeLabels: Record<string, string> = {
 const showDeleteButton = import.meta.env.VITE_SHOW_DELETE_BUTTON === 'true'
 
 export default memo(function JerseyCard({ jersey, onEdit, onDelete, onLike }: JerseyCardProps) {
+  const reduced = useReducedMotion()
   const [isImageLoading, setIsImageLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
@@ -102,12 +103,13 @@ export default memo(function JerseyCard({ jersey, onEdit, onDelete, onLike }: Je
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: reduced ? 0 : 16 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduced ? 0.01 : 0.4 }}
       className={cn(
         'group relative overflow-hidden rounded-2xl',
         'bg-[#141416] border border-white/[0.06]',
-        'transition-all duration-300',
+        'transition-[border-color,box-shadow,transform] duration-150 ease-[var(--ease-out)]',
         'hover:border-white/[0.12] hover:shadow-xl',
         'active:scale-[0.98] sm:active:scale-100'
       )}
@@ -153,10 +155,22 @@ export default memo(function JerseyCard({ jersey, onEdit, onDelete, onLike }: Je
             'flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5',
             'bg-black/50 backdrop-blur-sm rounded-full',
             'text-white/80 hover:text-rose-400 hover:bg-black/70',
-            'transition-all duration-200 active:scale-95'
+            'transition-[color,background-color,transform] duration-150 ease-[var(--ease-out)] active:scale-95'
           )}
         >
-          <Heart weight="fill" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500" />
+          <motion.span
+            key={jersey.likes}
+            initial={{ scale: 1 }}
+            animate={reduced ? {} : { scale: [1, 1.3, 1] }}
+            transition={{
+              type: 'spring',
+              stiffness: 400,
+              damping: 15,
+            }}
+            className="inline-flex"
+          >
+            <Heart weight="fill" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500" />
+          </motion.span>
           <span className="text-xs sm:text-sm font-medium">{jersey.likes}</span>
         </button>
       </div>

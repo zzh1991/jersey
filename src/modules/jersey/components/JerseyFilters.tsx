@@ -1,5 +1,6 @@
 import { useState, useCallback, memo } from 'react'
-import { MagnifyingGlass, Plus, Funnel, Heart, Calendar, CurrencyDollar, CaretUp, CaretDown } from '@phosphor-icons/react'
+import { motion } from 'framer-motion'
+import { MagnifyingGlass, Plus, Funnel, Heart, Calendar, CurrencyDollar, CaretUp } from '@phosphor-icons/react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { cn } from '@/shared/lib/utils'
@@ -92,13 +93,14 @@ export default memo(function JerseyFilters({
               <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>{label}</span>
               {sortBy === key && (
-                <span className="flex items-center">
-                  {sortOrder === 'asc' ? (
-                    <CaretUp className="w-3 h-3" />
-                  ) : (
-                    <CaretDown className="w-3 h-3" />
-                  )}
-                </span>
+                <motion.span
+                  className="flex items-center"
+                  initial={false}
+                  animate={{ rotate: sortOrder === 'asc' ? 0 : 180 }}
+                  transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+                >
+                  <CaretUp className="w-3 h-3" />
+                </motion.span>
               )}
             </Button>
           ))}

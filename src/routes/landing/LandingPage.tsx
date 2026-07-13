@@ -1,8 +1,10 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Link } from 'react-router'
 import { TShirt, Heart, MagnifyingGlass, Plus, ArrowRight } from '@phosphor-icons/react'
 
 export default function LandingPage() {
+  const reduced = useReducedMotion()
+
   return (
     <div className="min-h-[100dvh] bg-[#0a0a0b] flex flex-col">
       {/* Hero Section - Asymmetric Layout */}
@@ -10,9 +12,9 @@ export default function LandingPage() {
         <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
           {/* Left: Content */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: reduced ? 0 : -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: reduced ? 0.01 : 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-left"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4 sm:mb-6">
@@ -28,13 +30,13 @@ export default function LandingPage() {
             </p>
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: reduced ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
+              transition={{ duration: reduced ? 0.01 : 0.4, delay: reduced ? 0 : 0.3 }}
             >
               <Link
                 to="/jersey"
-                className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-blue-500 hover:bg-blue-400 text-white font-medium rounded-full transition-all duration-300 hover:gap-4 group active:scale-95"
+                className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-blue-500 hover:bg-blue-400 text-white font-medium rounded-full transition-[background-color,border-color,transform] duration-150 ease-[var(--ease-out)] group active:scale-95"
               >
                 <span>进入管理</span>
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
@@ -44,9 +46,9 @@ export default function LandingPage() {
 
           {/* Right: Feature Grid */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: reduced ? 0 : 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: reduced ? 0.01 : 0.6, delay: reduced ? 0 : 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="grid grid-cols-2 gap-3 sm:gap-4"
           >
             {[
@@ -57,10 +59,10 @@ export default function LandingPage() {
             ].map((item, index) => (
               <motion.div
                 key={item.label}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: reduced ? 0 : 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
-                className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-[#141416] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300 active:scale-[0.98]"
+                transition={{ duration: reduced ? 0.01 : 0.4, delay: reduced ? 0 : (0.4 + index * 0.06) }}
+                className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-[#141416] border border-white/[0.06] hover:border-white/[0.12] transition-[border-color,transform,box-shadow] duration-150 ease-[var(--ease-out)] active:scale-[0.98]"
               >
                 <div className={`inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl mb-3 sm:mb-4 ${
                   item.color === 'blue' ? 'bg-blue-500/20' :

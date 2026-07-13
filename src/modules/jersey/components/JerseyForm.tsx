@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, ClipboardText, MagnifyingGlassPlus } from '@phosphor-icons/react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -214,7 +215,20 @@ export default function JerseyForm({ jersey, isOpen, onClose, onSubmit }: Jersey
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{jersey ? '编辑球衣' : '新增球衣'}</DialogTitle>
+          <DialogTitle>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={jersey ? 'edit' : 'add'}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 4 }}
+                transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+                className="inline-block"
+              >
+                {jersey ? '编辑球衣' : '新增球衣'}
+              </motion.span>
+            </AnimatePresence>
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -233,7 +247,7 @@ export default function JerseyForm({ jersey, isOpen, onClose, onSubmit }: Jersey
                   'flex flex-col items-center justify-center w-full h-36 sm:h-48',
                   'border-2 border-dashed rounded-xl',
                   'cursor-pointer',
-                  'transition-all duration-200',
+                  'transition-[border-color,background-color] duration-150 ease-[var(--ease-out)]',
                   isDragOver
                     ? 'border-blue-500/50 bg-blue-500/10'
                     : previewImage
